@@ -1,0 +1,35 @@
+services:
+  mysql-db-service:
+    image: mysql:8.0
+    restart: always
+    container_name: mysql_db_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: adminapp_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_admin_app_data:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+
+  phpmyadmin-db-service:
+    container_name: phpmyadmin_db_container
+    image: phpmyadmin:latest
+    restart: always
+    ports:
+      - "8090:80"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      PMA_HOST: mysql-db-service
+      PMA_USER: user
+      PMA_PASSWORD: user
+    #    depends_on:
+    #      - mysql-db-service
+    links:
+      - mysql-db-service
+
+volumes:
+  mysql_admin_app_data:
